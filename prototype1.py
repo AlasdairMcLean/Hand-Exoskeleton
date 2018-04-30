@@ -74,7 +74,6 @@ def finger3_r(n):#finger 1
         x=x+1#counter
     pwm.setPWM(1, 0 , 4096)#shut off  
     
-
     
 def all(n):
     x=0
