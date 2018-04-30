@@ -20,7 +20,7 @@ servoMax = 450 # Max pulse length out of 4096
   #print pulseLength
   #pwm.setPWM(channel, 0, pulse)
   
-
+#Thumb
 def finger1(n):
     x=0
     while (x<n):
@@ -29,15 +29,15 @@ def finger1(n):
         x=x+1 
     pwm.setPWM(15, 0 , 4096)
     
-def finger1_r(n):#finger 1 
+def finger1_r(n):#thumb in reverse
     x=0
     while (x<n):#duration
         pwm.setPWM(15, 0, servoMin)#going foward
         time.sleep(1)
         x=x+1#counter
     pwm.setPWM(15, 0 , 4096)#shut off  
-
-def finger2(n):#finger 1 
+#forefinger
+def finger2(n):#forefinger
     x=0
     while (x<n):#duration
         pwm.setPWM(0, 0, 410)#going foward
@@ -49,7 +49,7 @@ def finger2(n):#finger 1
            # time.sleep(1)
         x=x+1#counter
     pwm.setPWM(0, 0 , 4096)#shut off
-def finger2_r(n):#finger 1 
+def finger2_r(n):#forefinger in reverse
     x=0
     while (x<n):#duration
         pwm.setPWM(0, 0, servoMin)#going reverse
@@ -57,7 +57,7 @@ def finger2_r(n):#finger 1
         x=x+1#counter
     pwm.setPWM(0, 0 , 4096)#shut off    
     
-    
+#middle finger
 def finger3(n):
     x=0
     while (x<n):
@@ -66,7 +66,7 @@ def finger3(n):
         x=x+1
     pwm.setPWM(1, 0 , 4096)
 
-def finger3_r(n):#finger 1 
+def finger3_r(n):#middle finger in reverse 
     x=0
     while (x<n):#duration
         pwm.setPWM(1, 0, servoMin)#going foward
@@ -74,7 +74,7 @@ def finger3_r(n):#finger 1
         x=x+1#counter
     pwm.setPWM(1, 0 , 4096)#shut off  
     
-    
+# first three fingers
 def all(n):
     x=0
     while (x<v):
@@ -87,6 +87,7 @@ def all(n):
     pwm.setPWM(1, 0 , 4096)
     pwm.setPWM(15, 0 , 4096)
     
+#reverse all fingers
 def reverse(n):#all fingers
     x=0
     while (x<v):#duration
