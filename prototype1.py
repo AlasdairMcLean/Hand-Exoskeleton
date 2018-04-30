@@ -32,7 +32,7 @@ def finger1(n):#finger 1
            # time.sleep(1)
         x=x+1#counter
     pwm.setPWM(0, 0 , 4096)#shut off
-def finger1_r(n):#finger 1 
+def finger1_r(n):#finger 1 in reverse
     x=0
     while (x<n):#duration
         pwm.setPWM(0, 0, servoMin)#going reverse
@@ -41,7 +41,7 @@ def finger1_r(n):#finger 1
     pwm.setPWM(0, 0 , 4096)#shut off    
     
     
-def finger2(n):
+def finger2(n): # finger 2 forwards
     x=0
     while (x<n):
         pwm.setPWM(1, 0, 450)
@@ -49,7 +49,7 @@ def finger2(n):
         x=x+1
     pwm.setPWM(1, 0 , 4096)
 
-def finger2_r(n):#finger 1 
+def finger2_r(n):#finger 2 in reverse
     x=0
     while (x<n):#duration
         pwm.setPWM(1, 0, servoMin)#going foward
@@ -57,7 +57,7 @@ def finger2_r(n):#finger 1
         x=x+1#counter
     pwm.setPWM(1, 0 , 4096)#shut off  
     
-def finger3(n):
+def finger3(n): # finger 3
     x=0
     while (x<n):
         pwm.setPWM(15, 0, 410)
@@ -65,7 +65,7 @@ def finger3(n):
         x=x+1 
     pwm.setPWM(15, 0 , 4096)
     
-def finger3_r(n):#finger 1 
+def finger3_r(n):#finger 3 in reverse
     x=0
     while (x<n):#duration
         pwm.setPWM(15, 0, servoMin)#going foward
