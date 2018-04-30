@@ -28,7 +28,13 @@ def finger1(n):
         time.sleep(1)
         x=x+1 
     pwm.setPWM(15, 0 , 4096)
-    
+
+    #GENERAL LOGIC:
+    #while button 1 true then 
+    #pwm.setPWM(15, 0, 410)
+    #    time.sleep(1)
+ 
+
 def finger1_r(n):#thumb in reverse
     x=0
     while (x<n):#duration
@@ -36,6 +42,9 @@ def finger1_r(n):#thumb in reverse
         time.sleep(1)
         x=x+1#counter
     pwm.setPWM(15, 0 , 4096)#shut off  
+
+#if button 2 true then
+
 #forefinger
 def finger2(n):#forefinger
     x=0
