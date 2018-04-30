@@ -20,7 +20,24 @@ servoMax = 450 # Max pulse length out of 4096
   #print pulseLength
   #pwm.setPWM(channel, 0, pulse)
   
-def finger1(n):#finger 1 
+
+def finger1(n):
+    x=0
+    while (x<n):
+        pwm.setPWM(15, 0, 410)
+        time.sleep(1)
+        x=x+1 
+    pwm.setPWM(15, 0 , 4096)
+    
+def finger1_r(n):#finger 1 
+    x=0
+    while (x<n):#duration
+        pwm.setPWM(15, 0, servoMin)#going foward
+        time.sleep(1)
+        x=x+1#counter
+    pwm.setPWM(15, 0 , 4096)#shut off  
+
+def finger2(n):#finger 1 
     x=0
     while (x<n):#duration
         pwm.setPWM(0, 0, 410)#going foward
@@ -32,7 +49,7 @@ def finger1(n):#finger 1
            # time.sleep(1)
         x=x+1#counter
     pwm.setPWM(0, 0 , 4096)#shut off
-def finger1_r(n):#finger 1 
+def finger2_r(n):#finger 1 
     x=0
     while (x<n):#duration
         pwm.setPWM(0, 0, servoMin)#going reverse
@@ -41,7 +58,7 @@ def finger1_r(n):#finger 1
     pwm.setPWM(0, 0 , 4096)#shut off    
     
     
-def finger2(n):
+def finger3(n):
     x=0
     while (x<n):
         pwm.setPWM(1, 0, 450)
@@ -49,7 +66,7 @@ def finger2(n):
         x=x+1
     pwm.setPWM(1, 0 , 4096)
 
-def finger2_r(n):#finger 1 
+def finger3_r(n):#finger 1 
     x=0
     while (x<n):#duration
         pwm.setPWM(1, 0, servoMin)#going foward
@@ -57,21 +74,7 @@ def finger2_r(n):#finger 1
         x=x+1#counter
     pwm.setPWM(1, 0 , 4096)#shut off  
     
-def finger3(n):
-    x=0
-    while (x<n):
-        pwm.setPWM(15, 0, 410)
-        time.sleep(1)
-        x=x+1 
-    pwm.setPWM(15, 0 , 4096)
-    
-def finger3_r(n):#finger 1 
-    x=0
-    while (x<n):#duration
-        pwm.setPWM(15, 0, servoMin)#going foward
-        time.sleep(1)
-        x=x+1#counter
-    pwm.setPWM(15, 0 , 4096)#shut off  
+
     
 def all(n):
     x=0
@@ -110,7 +113,7 @@ GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
 v= input('Enter the duration (s)')
 # y= input('Enter the strength')
-z=input('Select which finger you want to move: 1=index, 2=middle, 3=thumb, 4=all, 5=reverse motors')
+z=input('Select which finger you want to move: 1=thumb, 2=index, 3=middle, 4=all, 5=reverse motors')
 w=input('Select foward=0, reverse=1')
 
 x=0
@@ -123,7 +126,7 @@ if button_press==False:
         print('Stopping now')
         pwm.setPWM(0, 0 , 4096)
         time.sleep(1)
-        
+
 if int(z)==1:
     if int(w)==0:
         finger1(v)
