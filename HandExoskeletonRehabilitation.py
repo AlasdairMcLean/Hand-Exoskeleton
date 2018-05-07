@@ -17,8 +17,7 @@ import RPi.GPIO as GPIO
 
 #['Teacher']
 GPIO.setmode(GPIO.BOARD)
-GPIO.setup(7, GPIO.IN
-)           #, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(7, GPIO.IN)           #, pull_up_down=GPIO.PUD_UP)
 global pwm, SERVOMAXFREQ, INDEXCHANNEL, MIDDLECHANNEL, THUMBCHANNEL
 
 THUMBCHANNEL=0
@@ -49,6 +48,7 @@ def getTrialNum():
     return 1
 
 def onefingerstart(finger,time,freq):
+    pwm = PWM(0x70)
     if finger == 0:
         motorchannel=THUMBCHANNEL
     elif finger ==1:
@@ -69,9 +69,10 @@ def onefingerstart(finger,time,freq):
             #while button_press == False:
             #   button_press = GPIO.input(7)
         elapsed=elapsed+1   #counter
-    pwm.setPWM(motorchannel, 0 , 4096)#shut off
+    pwm = PWM(0x70)#shut off
 
 def twofingerstart(finger1,finger2,time,freq1,freq2):
+    pwm = PWM(0x70)
     if finger1 ==0:
         motorchannel1=THUMBCHANNEL
     elif finger1==1:
@@ -101,12 +102,11 @@ def twofingerstart(finger1,finger2,time,freq1,freq2):
             #while button_press == False:
             #   button_press = GPIO.input(7)
         elapsed=elapsed+1   #counter
-    pwm.setPWM(motorchannel1, 0 , 4096)#shut off
-    pwm.setPWM(motorchannel2, 0 , 4096)#shut off
+    pwm = PWM(0x70)#shut off
 
 
 def threefingerstart(time,freqthumb,freqind,freqmiddle):
-
+    pwm = PWM(0x70)
     elapsed=0
     while (elapsed<time):#duration
         button_press = GPIO.input(7)
@@ -120,36 +120,57 @@ def threefingerstart(time,freqthumb,freqind,freqmiddle):
             #while button_press == False:
             #   button_press = GPIO.input(7)
         elapsed=elapsed+1   #counter
-    pwm.setPWM(THUMBCHANNEL, 0 , 4096)#shut off
-    pwm.setPWM(INDEXCHANNEL, 0 , 4096)#shut off
-    pwm.setPWM(MIDDLECHANNEL, 0 , 4096)#shut off
+    pwm = PWM(0x70)
 
 def startprocedure():
     global thumbforceval, middleforceval, indexforceval, thumbdirval, indexdirval, middledirval
     forwardfreq=[410, 420, 430, 440, 450]
     reversefreq=[280, 290, 300, 310, 320]
+
     isthumbforward=thumbdirval.get()
     isindexforward=indexdirval.get()
     ismiddleforward=middledirval.get()
 
-    if isthumbforward+isindexforward+ismiddleforward == 3:
-        threefingerstart(1,forwardfreq[thumbforceval.get()],forwardfreq[indexforceval.get()],forwardfreq[middleforceval.get()])
-    elif isthumbforward+isindexforward+ismiddleforward == 2:
-        if isthumbforward ==0:
-            twofingerstart(1,2,1,forwardfreq[indexforceval.get()],forwardfreq[middleforceval.get()])
-        elif isindexforward == 0:
-            twofingerstart(0,2,1,forwardfreq[thumbforceval.get()],forwardfreq[middleforceval.get()])
-        else:
-            twofingerstart(0,1,1,forwardfreq[thumbforceval.get()],forwardfreq[indexforceval.get()])
-    elif isthumbforward+isindexforward+ismiddleforward == 1:
-        if isthumbforward == 1:
-            onefingerstart(0,1,forwardfreq[thumbforceval.get()])
-        elif isindexforward == 1:
-            onefingerstart(1,1,forwardfreq[indexforceval.get()])
-        elif ismiddleforward == 1:
-            onefingerstart(2,1,forwardfreq[middleforceval.get()])
+    fingerdirections=[0, 0, 0]
+    fingersmoving=0
+    if isthumbforward ==1:
+        fingersmoving+=1
+        fingerdirections[0]=forwardfreq[thumbforceval.get()-1]
+    if isthumbforward == -1:
+        fingersmoving +=1
+        fingerdirections[0]=reversefreq[thumbforceval.get()-1]
+    if isindexforward == 1:
+        fingersmoving+=1
+        fingerdirections[1]=forwardfreq[indexforceval.get()-1]
+    if isindexforward == -1:
+        fingersmoving+=1
+        fingerdirections[1]=reversefreq[indexforceval.get()-1]
+    if ismiddleforward == 1:
+        fingersmoving+=1
+        fingerdirections[2]=forwardfreq[middleforceval.get()-1]
+    if ismiddleforward == -1:
+        fingersmoving+=1
+        fingerdirections[2]=reversefreq[middleforceval.get()-1]
+    
+    if fingersmoving == 3:
+        threefingerstart(1,fingerdirections[0],fingerdirections[1],fingerdirections[2])
+    if fingersmoving == 2:
+        if fingerdirections[0]==0:
+            twofingerstart(1,2,1,fingerdirections[1],fingerdirections[2])
+        elif fingerdirections[1]==0:
+            twofingerstart(0,2,1,fingerdirections[0],fingerdirections[2])
+        elif fingerdirections[2]==0:
+            twofingerstart(1,2,1,fingerdirections[1],fingerdirections[2])
+    if fingersmoving == 1:
+        if fingerdirections[0]==1:
+            onefingerstart(0,1,fingerdirections[0])
+        elif fingerdirections[1]==1:
+            onefingerstart(1,1,fingerdirections[1])
+        elif fingerdirections[2]==1:
+            onefingerstart(2,1,fingerdirections[2])
     else:
         return
+    pwm = PWM(0x70)
 
 def stopprocedure():
     pwm = PWM(0x70)# Initialise the PWM device using the default address bmp = PWM(0x40, debug=True)
@@ -292,20 +313,23 @@ class Application(tk.Frame):
         indexlabeltxt.set('Index')
 
         middlelabeltxt=tk.StringVar()
-        middlelabel=tk.Label(directionframe,textvariable=middlelabeltxt).grid(row=0,column=2)
+        middlelabel=tk.Label(directionframe,textvariable=middlelabeltxt).grid(row=3,column=2)
         middlelabeltxt.set('Middle')
 
         thumbdirval=tk.IntVar()
-        thumbforwardradio=tk.Radiobutton(directionframe,text="", variable = thumbdirval, value=1).grid(row=1,column=1)
+        thumbreverseradio=tk.Radiobutton(directionframe,text="", variable = thumbdirval, value=-1).grid(row=1,column=1)
         thumboffradio=tk.Radiobutton(directionframe,text="", variable = thumbdirval, value=0).grid(row=1,column=2)
+        thumbforwardradio=tk.Radiobutton(directionframe,text="", variable = thumbdirval, value=1).grid(row=1,column=3)
 
         indexdirval=tk.IntVar()
-        indexforwardradio=tk.Radiobutton(directionframe,text="", variable = indexdirval, value=1).grid(row=2,column=1)
+        indexreverseradio=tk.Radiobutton(directionframe,text="", variable = indexdirval, value=-1).grid(row=2,column=1)
         indexoffradio=tk.Radiobutton(directionframe,text="", variable = indexdirval, value=0).grid(row=2,column=2)
+        indexforwardradio=tk.Radiobutton(directionframe,text="", variable = indexdirval, value=1).grid(row=2,column=3)
 
         middledirval=tk.IntVar()
-        middleforwardradio=tk.Radiobutton(directionframe,text="", variable = middledirval, value=1).grid(row=3,column=1)
+        middlereverseradio=tk.Radiobutton(directionframe,text="", variable = middledirval, value=-1).grid(row=3,column=1)
         middleoffradio=tk.Radiobutton(directionframe,text="", variable = middledirval, value=0).grid(row=3,column=2)        
+        middleforwardradio=tk.Radiobutton(directionframe,text="", variable = middledirval, value=1).grid(row=3,column=3)
 
     def create_actionpanel(self):
         actionframe=tk.Frame(root)
