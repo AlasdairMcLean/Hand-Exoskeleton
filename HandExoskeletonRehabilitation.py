@@ -1,9 +1,17 @@
-import tkinter as tk
+import Tkinter as tk
+import dialog as dlg
 import datetime
-import matplotlib
-matplotlib.use("TkAgg")
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-from matplotlib.figure import Figure
+
+import csv
+a=[]
+with open('test.csv', newline='') as csvfile:
+    myreader=csv.reader(csvfile, delimiter=' ', quotechar='|')
+    for row in myreader:
+        a.append(row)
+
+print(a[0:3][0:2])
+
+['Teacher']
 
 def getPatientName():
     return 'John Doe'
@@ -15,29 +23,46 @@ def getPatientGender():
     return 'male'
 
 def getDate():
+    months = ['January','February','March','April','May','June','July','August','September','October','November','December']
     curdate=datetime.date.today()
     curday=curdate.day
     curmon=curdate.month
     curyea=curdate.year
-    return str(curmon)+ '/' + str(curday) + '/' + str(curyea)
+    return months[curmon-1] + ' ' + str(curday) + ', ' + str(curyea)
 
 def getTrialNum():
     return 1
 
+def button1():
+    print('hello')
+
+def inputpatientinfocallback():
+    global PN,PG,PA,TN
+    patientinfoinput=dlg.InputDialog(root,'Input patient session info:')
+    if len(patientinfoinput.result)==4:
+        PN.set('Patient: ' + patientinfoinput.result['PatientName'])
+        PA.set('Age: ' + patientinfoinput.result['PatientAge'])
+        PG.set('Gender: ' + patientinfoinput.result['PatientGender'])
+        TN.set('Trial: ' + patientinfoinput.result['TrialNum'])
+
+def printromval():
+    global romvar
+    strromvar=str(romvar.get())
+    print(strromvar)
+
 
 class Application(tk.Frame):
     def __init__(self, master=None):
-        super().__init__(master)
+        tk.Frame.__init__(self, master)
         self.grid()
         self.winfo_toplevel().title("Hand Exoskeleton")
         self.create_info()
         self.create_forceinput()
         self.create_actionpanel()
         self.create_rompanel()
-        self.create_romgraph()
-        self.create_handpos()
 
     def create_info(self):
+        global PN,PA,TN,PG
         infoframe=tk.LabelFrame(root,text="Patient Information:")
         infoframe.grid(row=0,column=0,sticky='nsew')
         infoframe.columnconfigure(0,weight=1)
@@ -66,6 +91,10 @@ class Application(tk.Frame):
         self.PatientGender=tk.Label(master=infoframe, textvariable=TN)
         TN.set('Trial: ' + str(getTrialNum()))
         self.PatientGender.grid(row=4,column=0,sticky='w')
+        
+        inputpatientinfotxt=tk.StringVar()
+        inputpatientinfo=tk.Button(master=infoframe, command=inputpatientinfocallback, textvariable=inputpatientinfotxt).grid(row=4,column=1)
+        inputpatientinfotxt.set('Input patient information')
         
         #self.hi_there = tk.Button(self)
         #self.hi_there["text"] = "Hello World\n(click me)"
@@ -125,15 +154,15 @@ class Application(tk.Frame):
 
     def create_actionpanel(self):
         actionframe=tk.Frame(root)
-        actionframe.grid(row=2,column=0,sticky='nsew')
+        actionframe.grid(row=3,column=0,sticky='nsew')
         actionframe.columnconfigure(0,weight=1)        
         
         starttxt=tk.StringVar()
-        startbtn=tk.Button(actionframe,textvariable=starttxt).grid(row=0,column=0)
+        startbtn=tk.Button(actionframe,textvariable=starttxt,command=button1).grid(row=0,column=0)
         starttxt.set('Start Procedure')
 
         stoptxt=tk.StringVar()
-        stopbtn=tk.Button(actionframe,textvariable=stoptxt).grid(row=1,column=0)
+        stopbtn=tk.Button(actionframe,textvariable=stoptxt, command=printromval).grid(row=1,column=0)
         stoptxt.set('Stop Procedure')
 
         savetxt=tk.StringVar()
@@ -141,39 +170,27 @@ class Application(tk.Frame):
         savetxt.set('Save')
         
     def create_rompanel(self):
+        global romvar
         romframe=tk.LabelFrame(root,text='Range of Motion:')
-        romframe.grid(row=0,column=1,sticky='nsew')
+        romframe.grid(row=2,column=0,sticky='nsew')
         romframe.columnconfigure(0,weight=1)
         romframe.rowconfigure(0,weight=1)
-        romslider = tk.Scale(romframe, from_=0, to=100, orient=tk.HORIZONTAL,length=400)
+        romvar=tk.IntVar()
+        romslider = tk.Scale(romframe, variable=romvar, from_=0, to=100, orient=tk.HORIZONTAL,length=400)
         romslider.grid(column=0,row=0,sticky='nsew')
 
-    def create_romgraph(self):
-        graphframe=tk.Frame(root)
-        graphframe.grid(row=1,column=1,sticky='nsew')
-        f=Figure(figsize=(3,3),dpi=100)
-        a=f.add_subplot(111)
-        a.plot([1,2,3,4,5,6,7,8],[5,6,1,3,8,9,3,5])
-        canvas = FigureCanvasTkAgg(f, graphframe)
-        canvas.show()
-        canvas.get_tk_widget().pack(side=tk.BOTTOM, fill=tk.BOTH, expand=True)
+    # def create_romgraph(self):
+    #     graphframe=tk.Frame(root)
+    #     graphframe.grid(row=1,column=1,sticky='nsew')
 
-        #toolbar = NavigationToolbar2TkAgg(canvas, self)
-        #toolbar.update()
-        #canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
+    #     #toolbar = NavigationToolbar2TkAgg(canvas, self)
+    #     #toolbar.update()
+    #     #canvas._tkcanvas.pack(side=tk.TOP, fill=tk.BOTH, expand=True)
 
-    def create_handpos(self):
-        handposframe=tk.Frame(root)
-        handposframe.grid(row=2,column=1,sticky='nsew')
-        logo = tk.PhotoImage(file="indexfinger.png")
-        #im1 = tk.Label(handposframe, image=logo).grid(row=0,column=0)
-        #im2 = tk.Label(handposframe, image=logo).grid(row=0,column=1)
-        #im3 = tk.Label(handposframe, image=logo).grid(row=0,column=2)
-        im1 = tk.Label(handposframe, image=logo).pack(side='left',fill=tk.BOTH,expand=True)
-        
-        im2 = tk.Label(handposframe, image=logo).pack(side='left',fill=tk.BOTH,expand=True)
-        
-        im3 = tk.Label(handposframe, image=logo).pack(side='left',fill=tk.BOTH,expand=True)
+    # def create_handpos(self):
+    #     handposframe=tk.Frame(root)
+    #     handposframe.grid(row=2,column=1,sticky='nsew')
+
         
 
 root = tk.Tk()
