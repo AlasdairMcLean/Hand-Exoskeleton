@@ -1,16 +1,5 @@
 import Tkinter as tk
 import datetime
-#import matplotlib
-#matplotlib.use("TkAgg")
-#from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
-#from matplotlib.figure import Figure
-
-#!/usr/bin/python
-
-## MOTORS
-from Raspi_PWM_Servo_Driver import PWM
-import time
-import RPi.GPIO as GPIO
 
 global f1forwardfreq, f2forwardfreq, f3forwardfreq, f1reversefreq, f2reversefreq, f3reversefreq
 f1forwardfreq=0
@@ -20,10 +9,6 @@ f1reversefreq=0
 f2reversefreq=0
 f3reversefreq=0
 
-
-motors = PWM(0x70)# Initialise the PWM device using the default address bmp = PWM(0x40, debug=True)
-servoMin = 300  # Min pulse length out of 4096
-servoMax = 450 # Max pulse length out of 4096
 
 MOTORMAX = 4096
 
@@ -41,98 +26,6 @@ MIDCHANNEL=1
   #pulse /= pulseLength
   #print pulseLength
   #pwm.setPWM(channel, 0, pulse)
-  
-#Thumb
-def finger1forward(totaltime):
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(THMBCHANNEL, 0, f1forwardfreq) # set the channel
-        time.sleep(1)
-        timeelapsed+=1
-    motors.setPWM(THMBCHANNEL, 0 , MOTORMAX)
-
-    #GENERAL LOGIC:
-    #while button 1 true then 
-    #pwm.setPWM(15, 0, 410)
-    #    time.sleep(1)
- 
-
-def finger1reverse(totaltime):#thumb in reverse
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(THMBCHANNEL, 0, f1reversefreq) # set the channel
-        time.sleep(1)
-        timeelapsed+=1#counter
-    motors.setPWM(THMBCHANNEL, 0 , MOTORMAX)#shut off  
-
-#if button 2 true then
-
-#forefinger
-def finger2forward(totaltime):#forefinger
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(FORECHANNEL, 0, f2forwardfreq) # set the channel
-        time.sleep(1)
-        
-        #if button_press==False:
-         #   print('Stopping now')
-          #  pwm.setPWM(0, 0 , 4096)
-           # time.sleep(1)
-        timeelapsed+=1#counter
-    motors.setPWM(FORECHANNEL, 0 , MOTORMAX)#shut off
-def finger2reverse(totaltime):#forefinger in reverse
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(FORECHANNEL, 0, f2reversefreq) # set the channel
-        time.sleep(1)
-        timeelapsed+=1#counter
-    motors.setPWM(FORECHANNEL, 0 , MOTORMAX)#shut off    
-    
-#middle finger
-def finger3forward(totaltime):
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(MIDCHANNEL, 0, f3forwardfreq) # set the channel
-        time.sleep(1)
-        timeelapsed+=1
-    motors.setPWM(MIDCHANNEL, 0 , MOTORMAX)
-
-def finger3reverse(totaltime):#middle finger in reverse 
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(MIDCHANNEL, 0, f3reversefreq)# set the channel
-        time.sleep(1)
-        timeelapsed+=1#counter
-    motors.setPWM(MIDCHANNEL, 0 , MOTORMAX)#shut off  
-    
-# first three fingers
-def allforward(totaltime):
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(THMBCHANNEL, 0, f1forwardfreq) # set the channel
-        motors.setPWM(FORECHANNEL, 0, f2forwardfreq)
-        motors.setPWM(MIDCHANNEL, 0, f3forwardfreq)
-        timeelapsed+=1
-        time.sleep(1)
-    motors.setPWM(THMBCHANNEL, 0 , MOTORMAX)
-    motors.setPWM(FORECHANNEL, 0 , MOTORMAX)
-    motors.setPWM(MIDCHANNEL, 0 , MOTORMAX)
-    
-#reverse all fingers
-def allreverse(totaltime):#all fingers
-    timeelapsed=0 # initialize a counter to keep track of how many seconds have elapsed
-    while (timeelapsed<totaltime): #until the total time has elapsed,
-        motors.setPWM(THMBCHANNEL, 0, f1reversefreq) # set the channel
-        motors.setPWM(FORECHANNEL, 0, f2reversefreq)
-        motors.setPWM(MIDCHANNEL, 0, f3reversefreq)
-        timeelapsed+=1
-        time.sleep(1)
-    motors.setPWM(THMBCHANNEL, 0 , MOTORMAX)
-    motors.setPWM(FORECHANNEL, 0 , MOTORMAX)
-    motors.setPWM(MIDCHANNEL, 0 , MOTORMAX)
-
-
-
 
 #Thumb
 #def finger1forward(totaltime):
@@ -222,43 +115,6 @@ def allreverse(totaltime):#all fingers
 #    motors.setPWM(THMBCHANNEL, 0 , MOTORMAX)
 #    motors.setPWM(FORECHANNEL, 0 , MOTORMAX)
 #    motors.setPWM(MIDCHANNEL, 0 , MOTORMAX)
-
-
-
-
-
-
-
-motors.setPWMFreq(60)
-# Set frequency to 60 Hz
-
-GPIO.setmode(GPIO.BOARD)
-GPIO.setup(7, GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-  
-# pwm.setPWM(0, 0, servoMin)
-# time.sleep(1)
-
-#timeinput= input('Enter the duration (s)')
-#fingerinput=input('Select which finger you want to move: 1=thumb, 2=index, 3=middle, 4=all, 5=reverse motors')
-#forwardOrReverse=input('Select foward=0, reverse=1')
-
-x=0
-on=4096
-off=0
-
-button_press = GPIO.input(7)
-
-#if button_press==False:
-#        print('Stopping now')
-#        motors.setPWM(FORECHANNEL, 0 , MOTORMAX)
-#        time.sleep(1)
-
-#if int(fingerinput)==1:
-#    if int(forwardOrReverse)==0:
-#        finger1forward(timeinput)
-#    if int(forwardOrReverse)==1:
-#        finger1reverse(timeinput)
 #    #if button_press==False:
 #        #print('Stopping now')
 #        #pwm.setPWM(0, 0 , 4096)
@@ -373,11 +229,17 @@ class Application(tk.Frame):
         thumbforceval=tk.IntVar()
         thumblabel=tk.Label(forceinputframe,textvariable=thumblabeltxt).grid(row=0,column=0)
         thumblabeltxt.set('Thumb')
-        thumbradio1=tk.Radiobutton(forceinputframe,text="1", variable = thumbforceval, value=1).grid(row=0,column=1)
-        thumbradio2=tk.Radiobutton(forceinputframe,text="2", variable = thumbforceval, value=2).grid(row=0,column=2)
-        thumbradio3=tk.Radiobutton(forceinputframe,text="3", variable = thumbforceval, value=3).grid(row=0,column=3)
-        thumbradio4=tk.Radiobutton(forceinputframe,text="4", variable = thumbforceval, value=4).grid(row=0,column=4)
-        thumbradio5=tk.Radiobutton(forceinputframe,text="5", variable = thumbforceval, value=5).grid(row=0,column=5)
+        thumbradio1=tk.Radiobutton(forceinputframe,text="1", variable = thumbforceval, value=1)
+        thumbradio1.invoke()
+        thumbradio1.grid(row=0,column=1)
+        thumbradio2=tk.Radiobutton(forceinputframe,text="2", variable = thumbforceval, value=2)
+        thumbradio2.grid(row=0,column=2)
+        thumbradio3=tk.Radiobutton(forceinputframe,text="3", variable = thumbforceval, value=3)
+        thumbradio3.grid(row=0,column=3)
+        thumbradio4=tk.Radiobutton(forceinputframe,text="4", variable = thumbforceval, value=4)
+        thumbradio4.grid(row=0,column=4)
+        thumbradio5=tk.Radiobutton(forceinputframe,text="5", variable = thumbforceval, value=5)
+        thumbradio5.grid(row=0,column=5)
        
 
         indexlabeltxt=tk.StringVar()
@@ -400,12 +262,6 @@ class Application(tk.Frame):
         middleradio4=tk.Radiobutton(forceinputframe,text="4", variable = middleforceval, value=4).grid(row=2,column=4)
         middleradio5=tk.Radiobutton(forceinputframe,text="5", variable = middleforceval, value=5).grid(row=2,column=5)
 
-    def f1for(self):
-        global f1forwardfreq
-        print(string(f1forwardfreq))
-    def f1rev(self):
-        global f1reversefreq
-        print(string(f1reversefreq))
 
 
     def create_actionpanel(self):
@@ -414,12 +270,12 @@ class Application(tk.Frame):
         actionframe.columnconfigure(0,weight=1)        
         
         f1ftxt=tk.StringVar()
-        f1fbtn=tk.Button(actionframe,textvariable=f1ftxt,command=f1for).grid(row=0,column=0)
+        f1fbtn=tk.Button(actionframe,textvariable=f1ftxt).grid(row=0,column=0)
         f1ftxt.set('F1forward')
 
         f1rtxt=tk.StringVar()
-        f1rbtn=tk.Button(actionframe,textvariable=starttxt,command=f1rev).grid(row=0,column=1)
-        starttxt.set('F1reverse')
+        f1rbtn=tk.Button(actionframe,textvariable=f1rtxt).grid(row=0,column=1)
+        f1rtxt.set('F1reverse')
 
         starttxt=tk.StringVar()
         startbtn=tk.Button(actionframe,textvariable=starttxt).grid(row=0,column=2)
@@ -455,17 +311,17 @@ class Application(tk.Frame):
         graphframe.grid(row=1,column=1,sticky='nsew')
         graphframe.columnconfigure(0,weight=1)
         graphframe.rowconfigure(0,weight=1)
-        f1fslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400, command=update_f1f)
+        f1fslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400)
         f1fslider.grid(column=0,row=0,sticky='nsew')
-        f2fslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400, command=update_f1r)
+        f2fslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400)
         f2fslider.grid(column=0,row=1,sticky='nsew')
-        f3fslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400, command=update_f2f)
+        f3fslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400)
         f3fslider.grid(column=0,row=2,sticky='nsew')
-        f1rslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400, command=update_f2r)
+        f1rslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400)
         f1rslider.grid(column=0,row=3,sticky='nsew')
-        f2rslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400, command=update_f3f)
+        f2rslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400)
         f2rslider.grid(column=0,row=4,sticky='nsew')
-        f3rslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400, command=update_f3r)
+        f3rslider = tk.Scale(graphframe, from_=0, to=4096, orient=tk.HORIZONTAL,length=400)
         f3rslider.grid(column=0,row=5,sticky='nsew')
         #f=Figure(figsize=(3,3),dpi=100)
         #a=f.add_subplot(111)
