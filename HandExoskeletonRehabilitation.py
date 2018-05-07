@@ -1,17 +1,32 @@
+#!/usr/bin/python
 import Tkinter as tk
 import dialog as dlg
 import datetime
-
 import csv
-a=[]
-with open('test.csv', newline='') as csvfile:
-    myreader=csv.reader(csvfile, delimiter=' ', quotechar='|')
-    for row in myreader:
-        a.append(row)
+from Raspi_PWM_Servo_Driver import PWM
+import time
+import RPi.GPIO as GPIO
 
-print(a[0:3][0:2])
+#a=[]
+#with open('test.csv', newline='') as csvfile:
+#    myreader=csv.reader(csvfile, delimiter=' ', quotechar='|')
+#    for row in myreader:
+#        a.append(row)
 
-['Teacher']
+#print(a[0:3][0:2])
+
+#['Teacher']
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(7, GPIO.IN
+)           #, pull_up_down=GPIO.PUD_UP)
+global pwm, SERVOMAXFREQ, INDEXCHANNEL, MIDDLECHANNEL, THUMBCHANNEL
+
+THUMBCHANNEL=0
+INDEXCHANNEL=1
+MIDDLECHANNEL=15
+
+SERVOMAXFREQ=4096
+pwm = PWM(0x70)# Initialise the PWM device using the default address bmp = PWM(0x40, debug=True)
 
 def getPatientName():
     return 'John Doe'
@@ -33,8 +48,111 @@ def getDate():
 def getTrialNum():
     return 1
 
-def button1():
-    print('hello')
+def onefingerstart(finger,time,freq):
+    if finger == 0:
+        motorchannel=THUMBCHANNEL
+    elif finger ==1:
+        motorchannel=INDEXCHANNEL
+    elif finger ==2:
+        motorchannel=MIDDLECHANNEL
+    else:
+        raise ValueError
+
+    elapsed=0
+    while (elapsed<time):#duration
+        button_press = GPIO.input(7)
+        pwm.setPWM(motorchannel, 0, freq)#going foward
+        time.sleep(1)
+            
+            #print('Stopping now '+ str(x))
+            
+            #while button_press == False:
+            #   button_press = GPIO.input(7)
+        elapsed=elapsed+1   #counter
+    pwm.setPWM(motorchannel, 0 , 4096)#shut off
+
+def twofingerstart(finger1,finger2,time,freq1,freq2):
+    if finger1 ==0:
+        motorchannel1=THUMBCHANNEL
+    elif finger1==1:
+        motorchannel1=INDEXCHANNEL
+    elif finger1==2:
+        motorchannel1=MIDDLECHANNEL
+    else:
+        raise ValueError
+    if finger2 == 0:
+        motorchannel2=THUMBCHANNEL
+    elif finger2 == 1:
+        motorchannel2=INDEXCHANNEL
+    elif finger2 == 2:
+        motorchannel2=MIDDLECHANNEL
+    else:
+        raise ValueError
+
+    elapsed=0
+    while (elapsed<time):#duration
+        button_press = GPIO.input(7)
+        pwm.setPWM(motorchannel1, 0, freq1)#going foward
+        pwm.setPWM(motorchannel2, 0, freq2)#going 
+        time.sleep(1)
+            
+            #print('Stopping now '+ str(x))
+            
+            #while button_press == False:
+            #   button_press = GPIO.input(7)
+        elapsed=elapsed+1   #counter
+    pwm.setPWM(motorchannel1, 0 , 4096)#shut off
+    pwm.setPWM(motorchannel2, 0 , 4096)#shut off
+
+
+def threefingerstart(time,freqthumb,freqind,freqmiddle):
+
+    elapsed=0
+    while (elapsed<time):#duration
+        button_press = GPIO.input(7)
+        pwm.setPWM(THUMBCHANNEL, 0, freqthumb)#going foward
+        pwm.setPWM(INDEXCHANNEL, 0, freqind)#going 
+        pwm.setPWM(MIDDLECHANNEL, 0, freqmiddle)#going 
+        time.sleep(1)
+            
+            #print('Stopping now '+ str(x))
+            
+            #while button_press == False:
+            #   button_press = GPIO.input(7)
+        elapsed=elapsed+1   #counter
+    pwm.setPWM(THUMBCHANNEL, 0 , 4096)#shut off
+    pwm.setPWM(INDEXCHANNEL, 0 , 4096)#shut off
+    pwm.setPWM(MIDDLECHANNEL, 0 , 4096)#shut off
+
+def startprocedure():
+    global thumbforceval, middleforceval, indexforceval, thumbdirval, indexdirval, middledirval
+    forwardfreq=[410, 420, 430, 440, 450]
+    reversefreq=[280, 290, 300, 310, 320]
+    isthumbforward=thumbdirval.get()
+    isindexforward=indexdirval.get()
+    ismiddleforward=middledirval.get()
+
+    if isthumbforward+isindexforward+ismiddleforward == 3:
+        threefingerstart(1,forwardfreq[thumbforceval.get()],forwardfreq[indexforceval.get()],forwardfreq[middleforceval.get()])
+    elif isthumbforward+isindexforward+ismiddleforward == 2:
+        if isthumbforward ==0:
+            twofingerstart(1,2,1,forwardfreq[indexforceval.get()],forwardfreq[middleforceval.get()])
+        elif isindexforward == 0:
+            twofingerstart(0,2,1,forwardfreq[thumbforceval.get()],forwardfreq[middleforceval.get()])
+        else:
+            twofingerstart(0,1,1,forwardfreq[thumbforceval.get()],forwardfreq[indexforceval.get()])
+    elif isthumbforward+isindexforward+ismiddleforward == 1:
+        if isthumbforward == 1:
+            onefingerstart(0,1,forwardfreq[thumbforceval.get()])
+        elif isindexforward == 1:
+            onefingerstart(1,1,forwardfreq[indexforceval.get()])
+        elif ismiddleforward == 1:
+            onefingerstart(2,1,forwardfreq[middleforceval.get()])
+    else:
+        return
+
+def stopprocedure():
+    pwm = PWM(0x70)# Initialise the PWM device using the default address bmp = PWM(0x40, debug=True)
 
 def inputpatientinfocallback():
     global PN,PG,PA,TN
@@ -109,7 +227,7 @@ class Application(tk.Frame):
         #Label(master, text="First").grid(row=0, sticky=W)
         #bottomframe = tk.Frame(root)
     def create_forceinput(self):
-
+        global thumbforceval, indexforceval, middleforceval
         forceinputframe=tk.LabelFrame(root,text='Device tension:')
         forceinputframe.grid(row=1,column=0,sticky='nsew')
         forceinputframe.columnconfigure(0,weight=1)
@@ -152,17 +270,54 @@ class Application(tk.Frame):
         middleradio4=tk.Radiobutton(forceinputframe,text="4", variable = middleforceval, value=4).grid(row=2,column=4)
         middleradio5=tk.Radiobutton(forceinputframe,text="5", variable = middleforceval, value=5).grid(row=2,column=5)
 
+    def create_directionpanel(self):
+        global thumbdirval, indexdirval, middledirval
+        directionframe=tk.Frame(root)
+        directionframe.grid(row=3,column=0,sticky='nsew')
+        directionframe.columnconfigure(0,weight=1)      
+        forwardlabeltxt=tk.StringVar()
+        forwardlabel=tk.Label(directionframe,textvariable=forwardlabeltxt).grid(row=0,column=1)
+        forwardlabeltxt.set('Forward')
+        
+        offlabeltxt=tk.StringVar()
+        offlabel=tk.Label(directionframe,textvariable=offlabeltxt).grid(row=0,column=2)
+        offlabeltxt.set('Off')
+
+        thumbdirlabeltxt=tk.StringVar()
+        thumbdirlabel=tk.Label(directionframe,textvariable=thumbdirlabeltxt).grid(row=1,column=0)
+        thumbdirlabeltxt.set('Thumb')
+
+        indexlabeltxt=tk.StringVar()
+        indexlabel=tk.Label(directionframe,textvariable=indexlabeltxt).grid(row=2,column=0)
+        indexlabeltxt.set('Index')
+
+        middlelabeltxt=tk.StringVar()
+        middlelabel=tk.Label(directionframe,textvariable=middlelabeltxt).grid(row=0,column=2)
+        middlelabeltxt.set('Middle')
+
+        thumbdirval=tk.IntVar()
+        thumbforwardradio=tk.Radiobutton(directionframe,text="", variable = thumbdirval, value=1).grid(row=1,column=1)
+        thumboffradio=tk.Radiobutton(directionframe,text="", variable = thumbdirval, value=0).grid(row=1,column=2)
+
+        indexdirval=tk.IntVar()
+        indexforwardradio=tk.Radiobutton(directionframe,text="", variable = indexdirval, value=1).grid(row=2,column=1)
+        indexoffradio=tk.Radiobutton(directionframe,text="", variable = indexdirval, value=0).grid(row=2,column=2)
+
+        middledirval=tk.IntVar()
+        middleforwardradio=tk.Radiobutton(directionframe,text="", variable = middledirval, value=1).grid(row=3,column=1)
+        middleoffradio=tk.Radiobutton(directionframe,text="", variable = middledirval, value=0).grid(row=3,column=2)        
+
     def create_actionpanel(self):
         actionframe=tk.Frame(root)
-        actionframe.grid(row=3,column=0,sticky='nsew')
+        actionframe.grid(row=4,column=0,sticky='nsew')
         actionframe.columnconfigure(0,weight=1)        
         
         starttxt=tk.StringVar()
-        startbtn=tk.Button(actionframe,textvariable=starttxt,command=button1).grid(row=0,column=0)
+        startbtn=tk.Button(actionframe,textvariable=starttxt,command=startprocedure).grid(row=0,column=0)
         starttxt.set('Start Procedure')
 
         stoptxt=tk.StringVar()
-        stopbtn=tk.Button(actionframe,textvariable=stoptxt, command=printromval).grid(row=1,column=0)
+        stopbtn=tk.Button(actionframe,textvariable=stoptxt, command=stopprocedure).grid(row=1,column=0)
         stoptxt.set('Stop Procedure')
 
         savetxt=tk.StringVar()
